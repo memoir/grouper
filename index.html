@@ -714,9 +714,14 @@
         const draggable = document.createElement('div');
         draggable.classList.add('draggable');
         draggable.id = item.id;
-        draggable.textContent = item.content;
 
-        // Delete button for item
+        // Create a text span for the item's content
+        const textSpan = document.createElement('span');
+        textSpan.textContent = item.content;
+        textSpan.style.pointerEvents = 'none';
+        draggable.appendChild(textSpan);
+
+        // Delete button for item with improved styling for touch targets
         const delBtn = document.createElement('button');
         delBtn.textContent = '✕';
         delBtn.title = 'Kind löschen';
@@ -730,13 +735,38 @@
         delBtn.style.float = 'right';
         delBtn.style.position = 'relative';
         delBtn.style.top = '-2px';
-        delBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          deleteItem(item.id);
+        delBtn.style.padding = '2px 8px'; // Larger touch target
+        delBtn.style.pointerEvents = 'auto'; // Ensure button receives events
+
+        // Stop event propagation for all relevant events
+        ['click', 'touchstart', 'touchmove', 'touchend'].forEach(eventType => {
+          delBtn.addEventListener(eventType, (e) => {
+            e.stopPropagation();
+            if (eventType === 'click' || eventType === 'touchend') {
+              e.preventDefault();
+
+              // Handle removal from slots if needed
+              const slotRow = draggable.closest('.slot-row');
+              const dropzone = draggable.closest('.dropzone');
+
+              if (slotRow && dropzone) {
+                // Reset the slot row
+                slotRow.innerHTML = '<td></td>';
+                slotRow.dataset.empty = 'true';
+                slotRow.classList.remove('filled');
+
+                // Update the dropzone counter
+                const currentItems = parseInt(dropzone.getAttribute('data-current-items')) - 1;
+                dropzone.setAttribute('data-current-items', currentItems);
+                updateCounter(dropzone);
+              }
+
+              deleteItem(item.id);
+            }
+          });
         });
 
         draggable.appendChild(delBtn);
-
         draggable.setAttribute('draggable', 'true');
         draggableContainer.appendChild(draggable);
       });
@@ -744,15 +774,35 @@
     }
 
     function deleteItem(itemId) {
+      // Find the item first to handle its container properly
+      const itemElement = document.getElementById(itemId);
+
+      if (itemElement) {
+        // Check if item is in a slot row
+        const slotRow = itemElement.closest('.slot-row');
+        const dropzone = itemElement.closest('.dropzone');
+
+        if (slotRow && dropzone) {
+          // Reset the slot row
+          slotRow.innerHTML = '<td></td>';
+          slotRow.dataset.empty = 'true';
+          slotRow.classList.remove('filled');
+
+          // Update counter
+          const currentItems = parseInt(dropzone.getAttribute('data-current-items')) - 1;
+          dropzone.setAttribute('data-current-items', Math.max(0, currentItems));
+          updateCounter(dropzone);
+        }
+      }
+
       // Remove from items array
       items = items.filter(i => i.id !== itemId);
-      // Remove from any group/dropzone
-      document.querySelectorAll('.dropzone, #draggableContainer').forEach(zone => {
-        const el = zone.querySelector(`#${itemId}`);
-        if (el) zone.removeChild(el);
-      });
-      updateAllCurrentItems();
-      renderDraggables();
+
+      // Remove from DOM
+      if (itemElement) {
+        itemElement.remove();
+      }
+
       updateGroupSpaceInfo();
     }
 
