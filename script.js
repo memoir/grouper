@@ -1499,6 +1499,12 @@
         order: 3
       },
       {
+        content: `<p>Hier werden Informationen zum Verhältnis zwischen Elementen und vorhandenen Gruppenplätzen angezeigt.</p>`,
+        title: "Infobereich",
+        target: "#group_space_info",
+        order: 4
+      },
+      {
         content: `<p>Mit diesen Buttons können die Elemente per Zufall Gruppen zugeordnet werden.</p>
         <ul>
           <li>Der erste Button verteilt die Elemente in die erstellten Gruppen. Anzahl und Größe der Gruppen werden nicht verändert. Sollten mehr Elemente vorhanden sein als Platz in den Gruppen, so werden einige Elemente nicht zugeordnet.</li>
@@ -1507,26 +1513,26 @@
         </ul>`,
         title: "Zufällige Verteilung",
         target: "#random_buttons",
-        order: 4
+        order: 5
       },
       {
         content: `<p>Dieser Button bewegt alle Elemente zurück in den Bereich für nicht zugewiesene Elemente. Die Gruppenstruktur bleibt erhalten.</p>
         <p>Um ganz von vorne anzufangen, also ohne Gruppen und Elemente, kann man einfach die Seite neu laden.</p>`,
         title: "Zurücksetzen",
         target: "#btn_reset",
-        order: 5
+        order: 6
       },
       {
         content: `<p>Der Button "Speichern" speichert den aktuellen Stand in einer Datei. Mit dem Button "Laden" kann dieser später wiederhergestellt werden, um daran weiterzuarbeiten.</p>`,
         title: "Speichern und Laden",
         target: "#saveAndLoad",
-        order: 6
+        order: 7
       },
       {
         content: `<p>Dieser Button lädt eine einfache Textdatei herunter, die die aktuelle Gruppeneinteilung beinhaltet. Diese Datei kann später nicht wieder geladen werden, sieht aber etwas schöner aus.</p>`,
         title: "Textdatei runterladen",
         target: "#btn_download_text",
-        order: 7
+        order: 8
       }
     ]
     const tg = new tourguide.TourGuideClient({
