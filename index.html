@@ -896,6 +896,7 @@
     function setDraggableEvents() {
       const draggables = document.querySelectorAll('.draggable');
       draggables.forEach(draggable => {
+        // Mouse drag events
         draggable.addEventListener('dragstart', () => {
           draggable.classList.add('dragging');
           
@@ -920,7 +921,265 @@
           // Adjust heights of all groups after drag ends
           adjustAllGroupHeights();
         });
+
+        // Add touch event support
+        draggable.addEventListener('touchstart', handleTouchStart, { passive: false });
+        draggable.addEventListener('touchmove', handleTouchMove, { passive: false });
+        draggable.addEventListener('touchend', handleTouchEnd, { passive: false });
       });
+    }
+
+    // Touch event handling variables
+    let touchDragging = false;
+    let currentTouchElement = null;
+    let touchOffsetX = 0;
+    let touchOffsetY = 0;
+    let originalPosition = { parent: null, nextSibling: null };
+    
+    // Handle touch start event
+    function handleTouchStart(e) {
+      e.preventDefault(); // Prevent scrolling when starting to drag
+      
+      const touch = e.touches[0];
+      const draggable = e.currentTarget;
+      
+      // Store the element being touched
+      currentTouchElement = draggable;
+      
+      // Calculate touch offset relative to the element
+      const rect = draggable.getBoundingClientRect();
+      touchOffsetX = touch.clientX - rect.left;
+      touchOffsetY = touch.clientY - rect.top;
+      
+      // Store original position for potential cancel
+      originalPosition = {
+        parent: draggable.parentNode,
+        nextSibling: draggable.nextElementSibling
+      };
+      
+      // Apply dragging class and style
+      draggable.classList.add('dragging');
+      draggable.style.position = 'fixed';
+      draggable.style.zIndex = '1000';
+      draggable.style.opacity = '0.8';
+      
+      // Mark touch dragging as active
+      touchDragging = true;
+      
+      // Update the row when dragging starts
+      const parentRow = draggable.parentElement;
+      if (parentRow && parentRow.classList.contains('slot-row')) {
+        parentRow.dataset.dragging = 'true';
+        parentRow.dataset.empty = 'true';
+        parentRow.classList.remove('filled');
+      }
+      
+      // Move element to document body for unrestricted movement
+      document.body.appendChild(draggable);
+      
+      // Position at the touch point accounting for the offset
+      positionElementAtTouch(touch, draggable);
+    }
+
+    // Position element at touch location accounting for offset
+    function positionElementAtTouch(touch, element) {
+      element.style.left = (touch.clientX - touchOffsetX) + 'px';
+      element.style.top = (touch.clientY - touchOffsetY) + 'px';
+    }
+    
+    // Handle touch move event
+    function handleTouchMove(e) {
+      e.preventDefault(); // Prevent scrolling during drag
+      
+      if (!touchDragging || !currentTouchElement) return;
+      
+      const touch = e.touches[0];
+      
+      // Move the element with the touch
+      positionElementAtTouch(touch, currentTouchElement);
+      
+      // Find the element under the touch point for drop targeting
+      const dropTarget = getTouchDropTarget(touch);
+      
+      // Reset hover state on all potential drop targets
+      document.querySelectorAll('.slot-row').forEach(row => {
+        row.classList.remove('hover');
+      });
+      
+      // If over a valid drop target, highlight it
+      if (dropTarget && dropTarget.classList.contains('slot-row') && dropTarget.dataset.empty === 'true') {
+        dropTarget.classList.add('hover');
+      }
+    }
+    
+    // Find a drop target under the touch point
+    function getTouchDropTarget(touch) {
+      // Hide the dragged element temporarily to get accurate elementFromPoint
+      if (currentTouchElement) {
+        currentTouchElement.style.visibility = 'hidden';
+      }
+      
+      // Get the element at touch position
+      const element = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      // Make the dragged element visible again
+      if (currentTouchElement) {
+        currentTouchElement.style.visibility = 'visible';
+      }
+      
+      // For slot rows, return the row itself
+      if (element && element.classList && element.classList.contains('slot-row')) {
+        return element;
+      }
+      
+      // For cells inside rows, return the row
+      if (element && element.tagName === 'TD') {
+        return element.parentElement;
+      }
+      
+      // For the draggable container, return it
+      if (element && element.id === 'draggableContainer') {
+        return element;
+      }
+      
+      // For other elements, try to find a slot row or draggable container as parent
+      let parent = element;
+      while (parent) {
+        if (parent.classList && parent.classList.contains('slot-row')) {
+          return parent;
+        }
+        if (parent.id === 'draggableContainer') {
+          return parent;
+        }
+        parent = parent.parentElement;
+      }
+      
+      return null;
+    }
+    
+    // Handle touch end event
+    function handleTouchEnd(e) {
+      e.preventDefault();
+      
+      if (!touchDragging || !currentTouchElement) return;
+      
+      // Find drop target at the last touch position
+      const touch = e.changedTouches[0];
+      const dropTarget = getTouchDropTarget(touch);
+      
+      // Reset element styles
+      currentTouchElement.style.position = '';
+      currentTouchElement.style.left = '';
+      currentTouchElement.style.top = '';
+      currentTouchElement.style.zIndex = '';
+      currentTouchElement.style.opacity = '';
+      currentTouchElement.classList.remove('dragging');
+      
+      // Handle drop based on target
+      if (dropTarget) {
+        if (dropTarget.classList.contains('slot-row') && dropTarget.dataset.empty === 'true') {
+          // Drop into a slot row
+          handleDropIntoSlotRow(dropTarget, currentTouchElement);
+        } else if (dropTarget.id === 'draggableContainer') {
+          // Drop back into the draggable container
+          dropTarget.appendChild(currentTouchElement);
+          
+          // If it came from a slot row, update that row
+          if (originalPosition.parent && originalPosition.parent.classList.contains('slot-row')) {
+            updateSourceRowAfterDrag(originalPosition.parent);
+          }
+        } else {
+          // Invalid drop target, return to original position
+          returnToOriginalPosition();
+        }
+      } else {
+        // No drop target found, return to original position
+        returnToOriginalPosition();
+      }
+      
+      // Reset hover state on all drop targets
+      document.querySelectorAll('.slot-row').forEach(row => {
+        row.classList.remove('hover');
+      });
+      
+      // Reset touch tracking variables
+      touchDragging = false;
+      currentTouchElement = null;
+      
+      // Update counters and adjust heights
+      updateAllCurrentItems();
+      adjustAllGroupHeights();
+    }
+    
+    // Handle dropping an element into a slot row
+    function handleDropIntoSlotRow(row, element) {
+      // Clear the row
+      row.innerHTML = '';
+      
+      // Mark the row as filled
+      row.dataset.empty = 'false';
+      row.classList.add('filled');
+      row.classList.remove('hover');
+      
+      // Add the item to the row
+      row.appendChild(element);
+      
+      // If the element came from another slot row, update that row
+      if (originalPosition.parent && originalPosition.parent.classList.contains('slot-row')) {
+        updateSourceRowAfterDrag(originalPosition.parent);
+      }
+      
+      // Update dropzone counter
+      const dropzone = row.closest('.dropzone');
+      if (dropzone) {
+        const sourceZone = originalPosition.parent ? originalPosition.parent.closest('.dropzone') : null;
+        
+        // If moving from one zone to another, decrement source counter
+        if (sourceZone && sourceZone !== dropzone) {
+          const sourceItems = parseInt(sourceZone.getAttribute('data-current-items')) - 1;
+          sourceZone.setAttribute('data-current-items', Math.max(0, sourceItems));
+          updateCounter(sourceZone);
+        }
+        
+        // Update target zone counter
+        const currentItems = parseInt(dropzone.getAttribute('data-current-items')) + 1;
+        dropzone.setAttribute('data-current-items', currentItems);
+        updateCounter(dropzone);
+      }
+    }
+    
+    // Update a source row after an element has been dragged out
+    function updateSourceRowAfterDrag(row) {
+      if (!row) return;
+      
+      // Reset the source row
+      row.innerHTML = '<td></td>';
+      row.dataset.empty = 'true';
+      row.classList.remove('filled');
+      row.dataset.dragging = 'false';
+    }
+    
+    // Return dragged element to its original position
+    function returnToOriginalPosition() {
+      if (!currentTouchElement) return;
+      
+      if (originalPosition.parent) {
+        if (originalPosition.nextSibling) {
+          originalPosition.parent.insertBefore(currentTouchElement, originalPosition.nextSibling);
+        } else {
+          originalPosition.parent.appendChild(currentTouchElement);
+        }
+        
+        // If returning to a slot row, make sure it's marked as filled
+        if (originalPosition.parent.classList.contains('slot-row')) {
+          originalPosition.parent.dataset.empty = 'false';
+          originalPosition.parent.classList.add('filled');
+          originalPosition.parent.dataset.dragging = 'false';
+        }
+      } else {
+        // If no original parent (shouldn't happen), add to unassigned area
+        document.getElementById('draggableContainer').appendChild(currentTouchElement);
+      }
     }
 
     // Rückgabe von Items in den ursprünglichen Bereich ermöglichen
@@ -1465,5 +1724,4 @@
 
   </script>
 </body>
-
 </html>
