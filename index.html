@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gruppeneinteilung</title>
+  <title>Grouper</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -58,7 +58,7 @@
 
     .slot-row.hover {
       background-color: #e8f4e8;
-      border: 1px solid #4CAF50;
+      border: 1px solid #9F6A15;
     }
 
     /* Remove old slot container styles */
@@ -78,7 +78,7 @@
       width: 80%;
       margin: 40px auto;
       padding: 20px;
-      border: 2px solid #4CAF50;
+      border: 2px solid #9F6A15;
       background-color: #f9f9f9;
       border-radius: 10px;
     }
@@ -86,7 +86,7 @@
     .draggable {
       width: 100px;
       height: 40px;
-      background-color: #4CAF50;
+      background-color: #9F6A15;
       color: white;
       text-align: center;
       line-height: 40px;
@@ -186,12 +186,30 @@
       border-top: 1px solid #eee;
       text-align: center;
     }
+
+    /* Logo styles */
+    .logo {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 130px;
+      height: 130px;
+      z-index: 5;
+    }
+
+    /* Adjust main header to accommodate logo */
+    h1 {
+      margin-right: 150px;
+      color: #9F6A15;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Logo in the upper right corner -->
+  <img src="grouper_logo.png" alt="Grouper Logo" class="logo">
 
-  <h1>Gruppeneinteilung</h1>
+  <h1>Grouper</h1>
 
   <div class="group-controls">
     <button id="btn_add_group">Gruppe hinzufügen</button>
