@@ -63,11 +63,11 @@
 
     /* Remove old slot container styles */
     .slot-container {
-      display: none; /* Hide old slot container */
+      display: none;
     }
 
     .slot {
-      display: none; /* Hide old slots */
+      display: none;
     }
 
     .draggable-container {
@@ -710,7 +710,20 @@
     function renderDraggables() {
       const draggableContainer = document.getElementById('draggableContainer');
       draggableContainer.innerHTML = '';
+      
+      // Get the IDs of items already placed in groups
+      const assignedItemIds = new Set();
+      document.querySelectorAll('.dropzone .draggable').forEach(item => {
+        assignedItemIds.add(item.id);
+      });
+      
+      // Only render items that aren't already assigned to groups
       items.forEach(item => {
+        // Skip if this item is already in a group
+        if (assignedItemIds.has(item.id)) {
+          return;
+        }
+        
         const draggable = document.createElement('div');
         draggable.classList.add('draggable');
         draggable.id = item.id;
