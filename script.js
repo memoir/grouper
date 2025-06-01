@@ -1492,7 +1492,7 @@
         order: 2
       },
       {
-        content: `<p>Neu erstellte Elemente landen zunächst hier und können dann in die Gruppen verschoben werden. Bei Bedarf können sie auch wieder hier abgelegt werden.</p>
+        content: `<p>Neu erstellte Elemente landen zunächst hier und können dann in die Gruppen und zwischen den Gruppen hin- und herverschoben werden. Bei Bedarf können sie auch wieder hier abgelegt werden.</p>
         <p>Mit einem Klick auf das x können sie auch wieder gelöscht werden.</p>`,
         title: "Neue Elemente",
         target: "#draggableContainer",
