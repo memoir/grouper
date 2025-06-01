@@ -223,6 +223,7 @@
     <button id="btn_download">Speichern</button>
     <input type="file" id="configFile" style="display:none" accept="application/json">
     <button id="btn_load">Laden</button>
+    <button id="btn_download_text">Als Text speichern</button>
   </div>
 
   <footer>
@@ -951,6 +952,25 @@
 
       return config;
     }
+
+    // Download as text
+    document.getElementById('btn_download_text').addEventListener('click', () => {
+      // Get current configuration
+      const config = getCurrentConfiguration();
+      let textOutput = '';
+
+      // Format each group and its items
+      Object.keys(config).forEach(groupName => {
+        // Skip meta information and empty groups
+        if (groupName === '_meta' || config[groupName].length === 0) return;
+
+        // Add group name and its items
+        textOutput += `${groupName}:\n\t${config[groupName].join('\n\t')}\n\n`;
+      });
+
+      // Download as text file
+      download(textOutput, 'group_data.txt', 'text/plain');
+    });
 
     // Load configuration from file
     document.getElementById('btn_load').addEventListener('click', () => {
