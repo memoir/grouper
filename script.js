@@ -1511,7 +1511,7 @@
           <li>Der zweite Button legt so viele Gruppen an, wie im Auswahlfeld angegeben werden, und verteilt alle Elemente gleichmäßig auf diese Gruppen.</li>
           <li>Der dritte Button legt so viele Gruppen wie nötig an, um alle Elemente auf Gruppen der im Eingabefeld angegebenen Gruppengröße zu verteilen, und verteilt die Elemente per Zufall.</li>
         </ul>`,
-        title: "Zufällige Verteilung",
+        title: "Zufällige Verteilung (optional)",
         target: "#random_buttons",
         order: 5
       },
