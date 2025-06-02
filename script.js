@@ -1523,7 +1523,7 @@
         order: 6
       },
       {
-        content: `<p>Der Button "Speichern" speichert den aktuellen Stand in einer Datei. Mit dem Button "Laden" kann dieser später wiederhergestellt werden, um daran weiterzuarbeiten.</p>`,
+        content: `<p>Der Button „Speichern“ speichert den aktuellen Stand in einer Datei. Mit dem Button „Laden“ kann dieser später wiederhergestellt werden, um daran weiterzuarbeiten.</p>`,
         title: "Speichern und Laden",
         target: "#saveAndLoad",
         order: 7
