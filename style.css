@@ -177,6 +177,7 @@ body {
       color: #777;
       border-top: 1px solid #eee;
       text-align: center;
+      position: relative;
     }
 
     /* Logo styles */
@@ -187,6 +188,31 @@ body {
       width: 130px;
       height: 130px;
       z-index: 5;
+    }
+
+    /* Adjust for smaller screens */
+    @media screen and (max-width: 1048px) {
+      .logo {
+        /* Hide the header logo */
+        display: none;
+      }
+      
+      /* Show a smaller logo in the footer */
+      footer::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 60px;
+        background-image: url("grouper_logo.png");
+        background-size: contain;
+        background-repeat: no-repeat;
+        margin: 10px auto 0;
+      }
+      
+      /* Reset header margin when logo is hidden */
+      h1 {
+        margin-right: 0;
+      }
     }
 
     /* Adjust main header to accommodate logo */
