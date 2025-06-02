@@ -70,15 +70,15 @@ body {
       width: 80%;
       margin: 40px auto;
       padding: 20px;
-      border: 2px solid #9F6A15;
-      background-color: #f9f9f9;
+      border: 2px solid #023859;
+      background-color: #D8EBF2;
       border-radius: 10px;
     }
 
     .draggable {
       width: 100px;
       height: 40px;
-      background-color: #9F6A15;
+      background-color: #023859;
       color: white;
       text-align: center;
       line-height: 40px;
@@ -159,15 +159,15 @@ body {
     }
 
     .info-green {
-      color: #388e3c !important;
+      color: #667f1e !important;
     }
 
     .info-red {
-      color: #d32f2f !important;
+      color: #D92B04 !important;
     }
 
     .info-blue {
-      color: #1976d2 !important;
+      color: #2A78DD !important;
     }
 
     footer {
@@ -192,7 +192,7 @@ body {
     /* Adjust main header to accommodate logo */
     h1 {
       margin-right: 150px;
-      color: #9F6A15;
+      color: #023859;
     }
 
     .tourDialog {
